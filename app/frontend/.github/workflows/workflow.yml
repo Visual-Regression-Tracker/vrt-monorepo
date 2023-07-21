@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Unit tests
+        run: npm test -- --coverage
+
+      - id: get-branch-name
+        run: echo "::set-output name=branch_name::$(git symbolic-ref --short HEAD)"
+        shell: bash
+
+      # - name: Run Component tests 🧪
+      #   uses: cypress-io/github-action@v2
+      #   with:
+      #     command: npm run test:cy
+      #   env:
+      #     VRT_APIURL: "https://visual-regression-tracker.com:4200"
+      #     VRT_PROJECT: "VRT"
+      #     VRT_ENABLESOFTASSERT: false
+      #     VRT_APIKEY: ${{ secrets.VRT_API_KEY }}
+      #     VRT_BRANCHNAME: ${{ github.head_ref || steps.get-branch-name.outputs.branch_name }}
+      #     VRT_CIBUILDID: "Github run_id:  ${{ github.run_id }}"
+      #     CHOKIDAR_USEPOLLING: 1
